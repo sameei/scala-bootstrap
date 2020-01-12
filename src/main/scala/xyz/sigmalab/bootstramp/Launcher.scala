@@ -37,6 +37,13 @@ object Launcher {
             1 minute
         )
 
+        Try {
+            Await.result(actorSystem.whenTerminated, Duration.Inf)
+            sys.runtime.halt(0);
+        }.recover {
+            case cause: Throwable => sys.runtime.halt(1);
+        }
+
         logger.info("Waiting for [ENTER/RETURN] ...")
         scala.io.StdIn.readLine()
 

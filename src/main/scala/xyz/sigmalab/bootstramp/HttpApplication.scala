@@ -7,6 +7,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream.Materializer
 import akka.stream.scaladsl.Framing
 import akka.util.ByteString
+import org.slf4j.LoggerFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -56,6 +57,8 @@ class HttpApplication {
         }
     }
 
+    val logger = LoggerFactory.getLogger("HTTP.API")
+
     def route02(
         implicit
         actorSystem: ActorSystem,
@@ -71,6 +74,7 @@ class HttpApplication {
                     }
                 }
             } ~ get {
+                logger.info("GET /")
                 val response =
                     Http()
                         .singleRequest(HttpRequest(uri = "http://google.com"))
@@ -78,10 +82,12 @@ class HttpApplication {
                         .map{ bs => HttpEntity.Chunked.fromData(ContentTypes.`text/html(UTF-8)`, bs) }
                 complete(HttpUtil.marshallFutureHttpEntity(response))
             } ~ path("hello") {
+                logger.info("GET /hello")
                 get { complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, "Hello")) }
             }
         } ~ pathPrefix("stream") {
             post {
+                logger.info("POST /stream")
                 entity(as[SourceOf[Foo]]) { fooSource: SourceOf[Foo] =>
                     complete(fooSource.throttle(1, 2.seconds))
                 }
