@@ -1,0 +1,23 @@
+
+version: "3"
+
+services:
+  appx:
+    build: .
+    image: appx
+    ports:
+    - 8050:4050
+    networks:
+    - appnet
+
+networks:
+  appnet:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "true"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.238.0/24
+      - subnet: "2001:3984:3989::/64"
+        
